@@ -4841,6 +4841,10 @@ Variações: ${variacoesTexto.join(", ")}`;
 
           // Adicionar classe visual para destacar o item centralizado
           menuItem.classList.add("centered-item");
+        }
+        // Disponibilizar função globalmente para uso em outras rotinas
+        window.centralizarItemMenu = centralizarItemMenu;
+
         // Disponibilizar função globalmente para uso em outras rotinas
         window.centralizarItemMenu = centralizarItemMenu;
 
@@ -9022,4 +9026,5 @@ Variações: ${variacoesTexto.join(", ")}`;
       }
     </script>
   </body>
+<!-- Updated to ensure menu scroll works and scripts load without errors -->
 </html>
