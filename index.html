@@ -122,10 +122,8 @@
         margin: 0;
       }
 
-      /* Adicione no seu arquivo de CSS */
-      .variacoes-container[data-required="true"]:not(
-          :has(.variacao-checkbox:checked)
-        ) {
+      /* Estilos aplicados somente quando houver tentativa de adicionar sem selecionar */
+      .variacoes-container.erro-obrigatorio {
         animation: pulse 2s infinite;
         border: 2px solid #ef4444;
         border-radius: 8px;
@@ -3906,10 +3904,19 @@ Variações: ${variacoesTexto.join(", ")}`;
             produtoContainer.id ||
             `item-${Date.now()}`;
 
-          // Encontrar o container de variações
-          const variacoesContainer = produtoContainer.querySelector(
+          // Encontrar o container de variações (mobile/desktop)
+          const variacoesContainers = produtoContainer.querySelectorAll(
             ".variacoes-container"
           );
+          let variacoesContainer = Array.from(variacoesContainers).find(
+            (c) => c.offsetParent !== null
+          );
+
+          // Se nenhum container visível for encontrado, usar o primeiro
+          if (!variacoesContainer) {
+            variacoesContainer = variacoesContainers[0];
+          }
+
           if (!variacoesContainer) {
             // Se não houver variações, adicionar normalmente com os parâmetros corretos
             adicionarAoCarrinhoSimples(itemId, titulo, button, 0);
@@ -3925,14 +3932,11 @@ Variações: ${variacoesTexto.join(", ")}`;
             'input[type="checkbox"]:checked'
           );
 
-          // Se for obrigatório e nenhuma opção estiver selecionada, destacar as variações com borda vermelha
+          // Se for obrigatório e nenhuma opção estiver selecionada, destacar as variações
           if (isRequired && checkboxesSelecionados.length === 0) {
-            // Destacar o container de variações com borda vermelha
+            // Destacar o container de variações apenas após a tentativa de adicionar
             variacoesContainer.classList.add(
-              "border-red-500",
-              "border-2",
-              "rounded",
-              "p-2",
+              "erro-obrigatorio",
               "animate__animated",
               "animate__headShake"
             );
@@ -3945,8 +3949,7 @@ Variações: ${variacoesTexto.join(", ")}`;
             // Remover o destaque após 3 segundos
             setTimeout(() => {
               variacoesContainer.classList.remove(
-                "border-red-500",
-                "border-2",
+                "erro-obrigatorio",
                 "animate__animated"
               );
               variacoesContainer.classList.add("border", "border-gray-200"); // Voltar para uma borda sutil normal
