@@ -4733,7 +4733,7 @@ Variações: ${variacoesTexto.join(", ")}`;
               if (document.querySelector("#cardapio .categoria-secao")) {
                 inicializarCarregamentoImagens();
                 // Desconectar o observer após inicializar
-                this.disconnect();
+                observerCardapio.disconnect();
               }
             }
           });
@@ -4841,9 +4841,8 @@ Variações: ${variacoesTexto.join(", ")}`;
 
           // Adicionar classe visual para destacar o item centralizado
           menuItem.classList.add("centered-item");
-
-          // Console para debug
-                  }
+        // Disponibilizar função globalmente para uso em outras rotinas
+        window.centralizarItemMenu = centralizarItemMenu;
 
         // Função melhorada para encontrar a seção ativa com base no scroll atual (comportamento estilo iFood)
         function encontrarSecaoAtiva() {
