@@ -125,6 +125,7 @@
       /* Estilos aplicados somente quando houver tentativa de adicionar sem selecionar */
       .variacoes-container.erro-obrigatorio {
         animation: pulse-border 2s infinite;
+        animation: pulse 2s infinite;
         border: 2px solid #ef4444;
         border-radius: 8px;
         padding: 8px;
@@ -4841,6 +4842,8 @@ Variações: ${variacoesTexto.join(", ")}`;
           // Adicionar classe visual para destacar o item centralizado
           menuItem.classList.add("centered-item");
         }
+        // Disponibilizar função globalmente para uso em outras rotinas
+        window.centralizarItemMenu = centralizarItemMenu;
 
         // Disponibilizar função globalmente para uso em outras rotinas
         window.centralizarItemMenu = centralizarItemMenu;
