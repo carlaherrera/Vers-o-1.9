@@ -124,6 +124,7 @@
 
       /* Estilos aplicados somente quando houver tentativa de adicionar sem selecionar */
       .variacoes-container.erro-obrigatorio {
+        animation: pulse-border 2s infinite;
         animation: pulse 2s infinite;
         border: 2px solid #ef4444;
         border-radius: 8px;
@@ -131,7 +132,7 @@
         margin-bottom: 12px;
       }
 
-      @keyframes pulse {
+      @keyframes pulse-border {
         0% {
           box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
         }
@@ -1461,280 +1462,6 @@
         <!-- Categorias serão inseridas aqui dinamicamente -->
       </div>
 
-      <!-- Script para centralizar o item do menu durante o scroll (estilo iFood com navegação por âncoras) -->
-      <script>
-        // Função para centralizar o item do menu mobile ao fazer scroll (comportamento iFood)
-        function setupScrollCentralization() {
-          const categoryMenu = document.getElementById("category-scroll");
-          const categoryItems = document.querySelectorAll(".category-item");
-
-          // Verificar se existe o menu de categorias
-          if (!categoryMenu || categoryItems.length === 0) return;
-
-          // Coletar IDs das seções de categoria e configurar navegação por âncoras
-          let sections = [];
-          categoryItems.forEach((item) => {
-            const targetId = item.getAttribute("data-target");
-            if (targetId) {
-              const section = document.getElementById(targetId);
-              if (section) {
-                // Configurar âncora de navegação
-                item.href = `#${targetId}`;
-
-                // Adicionar ao array de seções para rastreamento
-                sections.push({
-                  id: targetId,
-                  menuItem: item,
-                  section: section,
-                  top: 0, // Será calculado depois
-                  bottom: 0, // Será calculado depois
-                });
-              }
-            }
-          });
-
-          // Função otimizada para atualizar as posições das seções durante o scroll
-          function atualizarPosicoesSecoes() {
-            // Atualizar as posições absolutas de cada seção no documento
-            sections.forEach((secInfo) => {
-              if (!secInfo.section) return;
-
-              const rect = secInfo.section.getBoundingClientRect();
-
-              // Converter posições relativas à viewport para posições absolutas no documento
-              secInfo.top = window.scrollY + rect.top;
-              secInfo.bottom = window.scrollY + rect.bottom;
-              secInfo.height = rect.height;
-
-              // Guardar também as posições relativas para cálculos mais precisos
-              secInfo.topRelative = rect.top;
-              secInfo.bottomRelative = rect.bottom;
-            });
-
-            // Ordenar seções do topo para o fim da página para navegação consistente
-            sections.sort((a, b) => a.top - b.top);
-          }
-
-          // Função para centralizar item do menu com animação suave
-          function centralizarItemMenu(menuItem, comportamento = "smooth") {
-            if (!categoryMenu || !menuItem) return;
-
-            const menuRect = categoryMenu.getBoundingClientRect();
-            const itemRect = menuItem.getBoundingClientRect();
-
-            // Calcular o deslocamento para centralizar o item
-            const menuCenterX = menuRect.width / 2;
-
-            // Posição do item em relação ao menu de categorias (não ao viewport)
-            // Usar offsetLeft para posicionamento correto em relação ao container
-            let targetScrollLeft =
-              menuItem.offsetLeft - menuCenterX + itemRect.width / 2;
-
-            // Garantir que não ultrapasse os limites
-            targetScrollLeft = Math.max(
-              0,
-              Math.min(
-                targetScrollLeft,
-                categoryMenu.scrollWidth - menuRect.width
-              )
-            );
-
-            // Aplicar scroll com comportamento especificado (suave ou instant)
-            categoryMenu.scrollTo({
-              left: targetScrollLeft,
-              behavior: comportamento,
-            });
-          }
-
-          // Função melhorada para encontrar a seção ativa com base no scroll atual (comportamento estilo iFood)
-          function encontrarSecaoAtiva() {
-            // Obter posição de scroll e dimensões da viewport
-            const scrollPosition = window.scrollY;
-            const viewportHeight = window.innerHeight;
-
-            // Calcular tamanho do header fixo para compensar na detecção
-            const headerTotalHeight =
-              document.getElementById("unified-header").offsetHeight;
-
-            // O ponto de detecção é no centro da viewport, ajustado pelo header
-            // Isso garante que a categoria seja ativada quando estiver no centro da tela
-            const viewportCenter = scrollPosition + viewportHeight / 2;
-            const detectionPoint = viewportCenter;
-
-            // Se estiver no topo da página, selecionar a primeira seção
-            if (scrollPosition < 50) {
-              return sections[0];
-            }
-
-            // Verificar cada seção para ver qual está no ponto de detecção
-            for (const secInfo of sections) {
-              if (
-                detectionPoint >= secInfo.top &&
-                detectionPoint <= secInfo.bottom
-              ) {
-                return secInfo;
-              }
-            }
-
-            // Se nenhuma seção for encontrada, encontrar a mais próxima do ponto de detecção
-            let closest = sections[0];
-            let closestDistance = Infinity;
-
-            sections.forEach((secInfo) => {
-              // Se a seção está abaixo do ponto de detecção, calcular distância até o topo da seção
-              if (secInfo.top > detectionPoint) {
-                const distance = secInfo.top - detectionPoint;
-                if (distance < closestDistance) {
-                  closestDistance = distance;
-                  closest = secInfo;
-                }
-              }
-              // Se a seção está acima do ponto de detecção, calcular distância até o final da seção
-              else if (secInfo.bottom < detectionPoint) {
-                const distance = detectionPoint - secInfo.bottom;
-                if (distance < closestDistance) {
-                  closestDistance = distance;
-                  closest = secInfo;
-                }
-              }
-            });
-
-            return closest;
-          }
-
-          // Função principal aprimorada para controlar o scroll e atualizar o menu (comportamento iFood)
-          function handleScroll() {
-            // Atualizar as posições das seções a cada scroll
-            atualizarPosicoesSecoes();
-
-            // Encontrar a seção ativa baseada na posição do scroll
-            const secaoAtiva = encontrarSecaoAtiva();
-
-            if (secaoAtiva && secaoAtiva.menuItem) {
-              // Variante anterior ativa para comparar mudanças
-              const previousActive = document.querySelector(
-                ".category-item.active"
-              );
-              const isNewActive = previousActive !== secaoAtiva.menuItem;
-
-              // Atualizar classe ativa apenas se mudou
-              if (isNewActive) {
-                // Remover classe ativa de todos os itens
-                categoryItems.forEach((item) =>
-                  item.classList.remove("active")
-                );
-
-                // Adicionar classe ativa ao item atual
-                secaoAtiva.menuItem.classList.add("active");
-
-                // Centralizar o item do menu no modo suave quando há mudança de categoria
-                centralizarItemMenu(secaoAtiva.menuItem, "smooth");
-
-                // Atualizar a URL sem recarregar a página (para manter histórico de navegação)
-                const targetId = secaoAtiva.id;
-                if (targetId) {
-                  history.replaceState(null, null, `#${targetId}`);
-                }
-              } else {
-                // Mesmo quando não muda a categoria, continuamos centralizando
-                // o item durante o scroll para garantir um comportamento tipo iFood
-                centralizarItemMenu(secaoAtiva.menuItem, "smooth");
-              }
-            }
-          }
-
-          // Configurar a detecção de scroll otimizada para garantir centralização suave durante o scroll
-          let lastScrollTime = 0;
-          const scrollThrottle = 50; // milisegundos entre atualizações (reduzido para maior suavidade)
-
-          window.addEventListener(
-            "scroll",
-            function (e) {
-              const now = Date.now();
-
-              // Usar throttling para limitar o número de atualizações
-              if (now - lastScrollTime >= scrollThrottle) {
-                // Usar requestAnimationFrame para sincronizar com o ciclo de renderização
-                window.requestAnimationFrame(function () {
-                  handleScroll();
-                });
-
-                lastScrollTime = now;
-              }
-            },
-            { passive: true }
-          );
-
-          // Adicionar event listeners para os cliques nos itens do menu
-          categoryItems.forEach((item) => {
-            item.addEventListener("click", function (e) {
-              // Impedir comportamento padrão para controlar a navegação manualmente
-              e.preventDefault();
-
-              // Remover classe ativa de todos os itens
-              categoryItems.forEach((item) => item.classList.remove("active"));
-
-              // Adicionar classe ativa a este item
-              this.classList.add("active");
-
-              // Centralizar o item imediatamente
-              centralizarItemMenu(this);
-
-              // Navegação para a seção correspondente
-              const targetId = this.getAttribute("data-target");
-              if (targetId) {
-                const targetSection = document.getElementById(targetId);
-                if (targetSection) {
-                  // Calcular posição com offset para o header
-                  const headerOffset =
-                    document.getElementById("unified-header").offsetHeight;
-                  const elementPosition =
-                    targetSection.getBoundingClientRect().top;
-                  const offsetPosition =
-                    elementPosition + window.pageYOffset - headerOffset - 20;
-
-                  // Scroll suave para a posição
-                  window.scrollTo({
-                    top: offsetPosition,
-                    behavior: "smooth",
-                  });
-
-                  // Atualizar URL sem recarregar a página (para manter estado da âncora)
-                  history.pushState(null, null, `#${targetId}`);
-                }
-              }
-            });
-          });
-
-          // Inicialização imediata
-          atualizarPosicoesSecoes();
-          handleScroll();
-        }
-
-        // Executar a configuração após o carregamento do cardápio
-        document.addEventListener("DOMContentLoaded", function () {
-          // Verificar se o cardápio já foi carregado
-          if (document.querySelector("#cardapio .categoria-secao")) {
-            setupScrollCentralization();
-          } else {
-            // Se não, esperar até que o cardápio seja renderizado
-            const observer = new MutationObserver(function (
-              mutations,
-              observer
-            ) {
-              if (document.querySelector("#cardapio .categoria-secao")) {
-                setupScrollCentralization();
-                observer.disconnect();
-              }
-            });
-
-            observer.observe(document.body, {
-              childList: true,
-              subtree: true,
-            });
-          }
-        });
-      </script>
 
       <!-- Seção de Avaliação -->
       <div
@@ -2778,21 +2505,12 @@
           footer.style.background = `linear-gradient(135deg, ${config["Cor Primária"]} 0%, ${config["Cor Secundária"]} 100%)`;
         }
 
-        console.log("Cores aplicadas dinamicamente:", {
-          primaria: config["Cor Primária"],
-          secundaria: config["Cor Secundária"],
-          fundo: config["Cor de Fundo"],
-          texto: config["Cor do Texto"],
-          textoRodape: config["Cor do Texto Rodapé"],
-          links: config["Cor dos Links"],
-        });
-      }
+              }
 
       // Função para carregar dados das planilhas
       async function carregarDados() {
         try {
-          console.log("Carregando dados das planilhas...");
-
+          
           const [categoriasRes, itensRes, configRes] = await Promise.all([
             fetch(URLS.categorias),
             fetch(URLS.itens),
@@ -2810,15 +2528,7 @@
 
           // Debug: Verificar a estrutura dos dados da categoria
           if (dadosGlobais.categorias && dadosGlobais.categorias.length > 0) {
-            console.log(
-              "Estrutura da primeira categoria:",
-              dadosGlobais.categorias[0]
-            );
-            console.log(
-              "Todas as chaves disponíveis:",
-              Object.keys(dadosGlobais.categorias[0])
-            );
-          }
+                                  }
 
           const configArray = csvToArray(configCsv);
           dadosGlobais.config = {};
@@ -2838,8 +2548,7 @@
           // Salvar a âncora atual para navegação após renderização completa
           if (window.location.hash) {
             window.ancoraPendente = window.location.hash.substring(1);
-            console.log("Âncora detectada na URL:", window.ancoraPendente);
-          }
+                      }
         } catch (error) {
           console.error("Erro ao carregar dados:", error);
           document.getElementById("loading").innerHTML =
@@ -2867,8 +2576,7 @@
               } ${item.Classificação_Adicional || ""}`.toLowerCase(),
             };
           });
-        console.log("Dados preparados para busca:", todosItens.length, "itens");
-      }
+              }
 
       // Função de busca
       function realizarBusca(termo) {
@@ -3378,8 +3086,7 @@
 
         // Verificar configuração de modo de checkout
         const checkoutMode = config["Checkout-Mode"] || "Sim";
-        console.log("Modo de checkout:", checkoutMode);
-
+        
         // Controlar visibilidade do carrinho flutuante e controles de quantidade
         if (
           checkoutMode.toLowerCase() === "não" ||
@@ -3408,8 +3115,7 @@
           window.ocultarControlesCarrinho = false;
         }
 
-        console.log("Configurações aplicadas:", config);
-      }
+              }
 
       // Função para processar URLs de imagens (Dropbox, Google Drive e outras fontes)
       function processarURLImagem(url) {
@@ -3431,40 +3137,35 @@
           let originalUrl = url;
 
           try {
-            console.log("Processando URL do Google Drive:", url);
-
+            
             // Padrão para links de compartilhamento: https://drive.google.com/file/d/ID_DA_IMAGEM/view?usp=drive_link ou usp=sharing
             if (url.includes("/file/d/")) {
               // Captura o ID entre /file/d/ e /view ou o final da string
               const match = url.match(/\/file\/d\/([^\/]+)(?:\/|$)/);
               if (match && match[1]) {
                 fileId = match[1];
-                console.log("ID encontrado via padrão /file/d/:", fileId);
-              }
+                              }
             }
             // Padrão para links de visualização direta: https://drive.google.com/uc?id=ID_DA_IMAGEM
             else if (url.includes("id=")) {
               const match = url.match(/id=([^&]+)/);
               if (match && match[1]) {
                 fileId = match[1];
-                console.log("ID encontrado via padrão id=:", fileId);
-              }
+                              }
             }
             // Padrão para links de compartilhamento aberto: https://drive.google.com/open?id=ID_DA_IMAGEM
             else if (url.includes("/open?")) {
               const match = url.match(/open\?id=([^&]+)/);
               if (match && match[1]) {
                 fileId = match[1];
-                console.log("ID encontrado via padrão /open?:", fileId);
-              }
+                              }
             }
             // Padrão para links de visualização: https://docs.google.com/uc?export=view&id=ID_DA_IMAGEM
             else if (url.includes("export=view")) {
               const match = url.match(/id=([^&]+)/);
               if (match && match[1]) {
                 fileId = match[1];
-                console.log("ID encontrado via padrão export=view:", fileId);
-              }
+                              }
             }
             // Padrão para links compartilhados diretamente da interface do Google Drive
             else if (url.includes("sharing")) {
@@ -3474,8 +3175,7 @@
                 const idParam = urlParams.get("id");
                 if (idParam) {
                   fileId = idParam;
-                  console.log("ID encontrado via parâmetro id na URL:", fileId);
-                }
+                                  }
               } catch (e) {
                 console.warn("Erro ao analisar URL de compartilhamento:", e);
               }
@@ -3486,11 +3186,7 @@
               const idMatches = url.match(/[-\w]{25,}/);
               if (idMatches && idMatches[0]) {
                 fileId = idMatches[0];
-                console.log(
-                  "ID encontrado via expressão regular genérica:",
-                  fileId
-                );
-              }
+                              }
             }
 
             // Limpar o ID (remover qualquer parâmetro adicional)
@@ -3514,15 +3210,13 @@
                   betterMatch[0].length >= 25
                 ) {
                   fileId = betterMatch[0];
-                  console.log("ID corrigido após validação:", fileId);
-                }
+                                  }
               }
             }
 
             // Se encontrou o ID, retorna a URL formatada para exibição da imagem
             if (fileId) {
-              console.log("ID da imagem do Google Drive encontrado:", fileId);
-              // Usar o formato de thumbnail para melhor performance
+                            // Usar o formato de thumbnail para melhor performance
               // sz=w400 define a largura máxima como 400px, mantendo a proporção
               const thumbnailUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w400`;
 
@@ -3618,8 +3312,7 @@
             ".menu-item-mobile-price"
           );
           if (!precoMobileElement) {
-            console.log("Elemento de preço mobile não encontrado");
-          }
+                      }
 
           // Obter o preço base do produto
           // Primeiro tentamos obter do data-attribute, que deve conter apenas o valor numérico
@@ -3629,8 +3322,7 @@
           if (!precoBaseStr || precoBaseStr === "0" || precoBaseStr === "") {
             // Pegamos o texto do preço exibido e extraímos o valor numérico
             const precoVisivel = precoElement.textContent.trim();
-            console.log("Extraindo preço do texto visível:", precoVisivel);
-
+            
             // Extrair apenas números, ponto e vírgula (removendo R$, etc)
             precoBaseStr = precoVisivel.replace(/[^0-9,]/g, "");
 
@@ -3651,8 +3343,7 @@
             return;
           }
 
-          console.log("Preço base identificado e convertido:", precoBase);
-
+          
           // Buscar todas as variações selecionadas
           const checkboxesSelecionados = container.querySelectorAll(
             'input[type="checkbox"]:checked'
@@ -3668,10 +3359,7 @@
             const precoAdicionalStr = cb.getAttribute("data-preco-adicional");
 
             // Debug: Mostrar cada variação e seu preço adicional
-            console.log(
-              `Variação selecionada: ${cb.value}, Preço adicional (string): ${precoAdicionalStr}`
-            );
-
+            
             // Converter para número garantindo que temos um valor válido
             let precoAdicional = 0;
             if (precoAdicionalStr && precoAdicionalStr !== "") {
@@ -3681,8 +3369,7 @@
             }
 
             // Debug: Mostrar o preço adicional convertido
-            console.log(`Preço adicional convertido: ${precoAdicional}`);
-
+            
             if (!isNaN(precoAdicional) && precoAdicional > 0) {
               // Somar ao preço total
               precoTotal += precoAdicional;
@@ -3697,13 +3384,7 @@
           });
 
           // Debug: Mostrar o preço total calculado
-          console.log(
-            "Preço total calculado:",
-            precoTotal,
-            "Variações:",
-            variacoesTexto.join(", ")
-          );
-
+          
           // Formatar o preço total para exibição (com duas casas decimais e vírgula)
           const precoFormatado = `R$${precoTotal.toFixed(2).replace(".", ",")}`;
 
@@ -3831,12 +3512,7 @@
           }, 500);
 
           // Registrar sucesso da operação
-          console.log(
-            `Preço atualizado com sucesso para ${precoFormatado} (Base: ${precoBase.toFixed(
-              2
-            )})`
-          );
-
+          
           // Adicionar tooltip detalhado com informações sobre o preço
           if (variacoesTexto.length > 0) {
             // Criar tooltip detalhado mostrando o preço base e cada variação adicionada
@@ -3996,20 +3672,9 @@ Variações: ${variacoesTexto.join(", ")}`;
 
             // Concatenar o título com as variações selecionadas incluindo os preços
             tituloFinal = `${titulo} (${variacoes.join(", ")})`;
-            console.log(
-              `Variações selecionadas com preços: ${variacoes.join(
-                ", "
-              )} para o produto: ${titulo}`
-            );
-            console.log(
-              `Preço adicional total: R$ ${precoAdicionalTotal.toFixed(2)}`
-            );
-          } else {
+                                  } else {
             // Nenhuma variação selecionada, mantenha o título original
-            console.log(
-              `Nenhuma variação selecionada para o produto: ${titulo}`
-            );
-          }
+                      }
 
           // Chamar a função para adicionar ao carrinho
           adicionarAoCarrinhoSimples(
@@ -4031,8 +3696,7 @@ Variações: ${variacoesTexto.join(", ")}`;
 
       // Renderizar cardápio
       function renderizarCardapio() {
-        console.log("Iniciando renderização do cardápio...");
-
+        
         const cardapioContainer = document.getElementById("cardapio");
         const categoryScrollMobile = document.getElementById("category-scroll");
 
@@ -4133,12 +3797,7 @@ Variações: ${variacoesTexto.join(", ")}`;
           if (itensCategoria.length === 0) return;
 
           // Verificar e logar informações sobre a categoria e sua imagem para depuração
-          console.log("Renderizando categoria:", categoria.Nome_Categoria);
-          console.log(
-            "Campos disponíveis na categoria:",
-            Object.keys(categoria)
-          );
-
+                    
           // Com base na planilha compartilhada, vamos tentar todos os possíveis campos para URL da imagem
           // O campo correto é 'E' na planilha que pode ser mapeado para diferentes nomes
           const imagemURLOriginal =
@@ -4823,12 +4482,7 @@ Variações: ${variacoesTexto.join(", ")}`;
 
             // Forçar a alternância manual do estado de seleção
             input.checked = !input.checked;
-            console.log(
-              `Botão de variação clicado: ${input.value}, estado: ${
-                input.checked ? "marcado" : "desmarcado"
-              }`
-            );
-
+            
             // Atualizar estilo do botão atual
             const btn = label.querySelector(".variacao-btn");
             if (input.checked) {
@@ -5046,8 +4700,7 @@ Variações: ${variacoesTexto.join(", ")}`;
     <script>
       // Função para inicializar o carregamento de imagens
       function inicializarCarregamentoImagens() {
-        console.log("Inicializando sistema de carregamento de imagens...");
-        // Selecionar todas as imagens dentro de containers de skeleton
+                // Selecionar todas as imagens dentro de containers de skeleton
         document.querySelectorAll(".image-skeleton img").forEach((img) => {
           // Verificar se a imagem já está carregada (pode acontecer com cache)
           if (img.complete) {
@@ -5190,10 +4843,7 @@ Variações: ${variacoesTexto.join(", ")}`;
           menuItem.classList.add("centered-item");
 
           // Console para debug
-          console.log(
-            `Centralizando: ${menuItem.textContent} - scrollLeft: ${targetScrollLeft}`
-          );
-        }
+                  }
 
         // Função melhorada para encontrar a seção ativa com base no scroll atual (comportamento estilo iFood)
         function encontrarSecaoAtiva() {
@@ -5211,13 +4861,7 @@ Variações: ${variacoesTexto.join(", ")}`;
           // Isso garante que a categoria seja ativada quando entrar na área visível
           const topVisibleArea = scrollPosition + headerTotalHeight + 50; // 50px de offset
 
-          console.log(
-            "Ponto de detecção:",
-            topVisibleArea,
-            "Header height:",
-            headerTotalHeight
-          );
-
+          
           // Se estiver no topo da página, selecionar a primeira seção
           if (scrollPosition < 50) {
             return sections[0];
@@ -5270,11 +4914,7 @@ Variações: ${variacoesTexto.join(", ")}`;
           // Encontrar a seção ativa baseada na posição do scroll
           const secaoAtiva = encontrarSecaoAtiva();
 
-          console.log(
-            "Verificando scroll - secaoAtiva:",
-            secaoAtiva ? secaoAtiva.id : "nenhuma"
-          );
-
+          
           if (secaoAtiva && secaoAtiva.menuItem) {
             // Variante anterior ativa para comparar mudanças
             const previousActive = document.querySelector(
@@ -5304,10 +4944,7 @@ Variações: ${variacoesTexto.join(", ")}`;
             }
 
             if (isNewActive) {
-              console.log(
-                `Seção ativa alterada para: ${secaoAtiva.menuItem.textContent}`
-              );
-            }
+                          }
           }
         }
 
@@ -5511,8 +5148,7 @@ Variações: ${variacoesTexto.join(", ")}`;
        * @param {string} cep - O CEP a ser consultado
        */
       function buscarCep(cep) {
-        console.log("Buscando CEP:", cep);
-
+        
         // Remove caracteres não numéricos
         cep = cep.replace(/\D/g, "");
 
@@ -5537,8 +5173,7 @@ Variações: ${variacoesTexto.join(", ")}`;
             return response.json();
           })
           .then((data) => {
-            console.log("Dados retornados da API ViaCEP:", data);
-
+            
             if (data.erro) {
               // CEP não encontrado
               mostrarFeedbackCep(
@@ -5668,17 +5303,12 @@ Variações: ${variacoesTexto.join(", ")}`;
           (window.location.hash ? window.location.hash.substring(1) : null);
 
         if (ancoraPendente) {
-          console.log("Tentando navegar para âncora:", ancoraPendente);
-
+          
           // Buscar o elemento correspondente à âncora
           const elemento = document.getElementById(ancoraPendente);
 
           if (elemento) {
-            console.log(
-              "Elemento da âncora encontrado, rolando para:",
-              ancoraPendente
-            );
-
+            
             // Pequeno atraso para garantir que todos os elementos estejam renderizados
             // e que o layout esteja estável
             setTimeout(() => {
@@ -5707,23 +5337,14 @@ Variações: ${variacoesTexto.join(", ")}`;
               window.ancoraPendente = null;
 
               // Adicionar um log de sucesso
-              console.log(
-                "Navegação para âncora concluída com sucesso:",
-                ancoraPendente
-              );
-            }, 300); // Aumentado para 300ms para garantir que todos os elementos estejam estáveis
+                          }, 300); // Aumentado para 300ms para garantir que todos os elementos estejam estáveis
           } else {
-            console.log("Elemento da âncora não encontrado:", ancoraPendente);
-            // Tentar novamente após um tempo maior, caso o elemento ainda não tenha sido criado
+                        // Tentar novamente após um tempo maior, caso o elemento ainda não tenha sido criado
             setTimeout(() => {
               const elementoRetentativa =
                 document.getElementById(ancoraPendente);
               if (elementoRetentativa) {
-                console.log(
-                  "Elemento encontrado na segunda tentativa, rolando para:",
-                  ancoraPendente
-                );
-                // Rolar suavemente até o elemento com offset para o menu fixo
+                                // Rolar suavemente até o elemento com offset para o menu fixo
                 const headerOffset =
                   document.getElementById("unified-header").offsetHeight;
                 const scrollOffset = Math.max(headerOffset, 170);
@@ -5753,16 +5374,12 @@ Variações: ${variacoesTexto.join(", ")}`;
 
       // Executar a configuração após o carregamento do cardápio
       document.addEventListener("DOMContentLoaded", function () {
-        console.log("DOM carregado, inicializando scroll de categorias...");
-
+        
         // Função para tentar inicializar o scroll
         function inicializarScroll() {
           // Verificar se o cardápio já foi carregado
           if (document.querySelector("#cardapio .categoria-secao")) {
-            console.log(
-              "Cardápio encontrado, configurando scroll de categorias"
-            );
-            setupScrollCentralization();
+                        setupScrollCentralization();
             navegarParaAncoraPendente(); // Tentar navegar para âncora se existir
             return true;
           }
@@ -5771,14 +5388,10 @@ Variações: ${variacoesTexto.join(", ")}`;
 
         // Tentar inicializar imediatamente
         if (!inicializarScroll()) {
-          console.log("Cardápio ainda não carregado, configurando observer...");
-          // Se não, esperar até que o cardápio seja renderizado
+                    // Se não, esperar até que o cardápio seja renderizado
           const observer = new MutationObserver(function (mutations, observer) {
             if (inicializarScroll()) {
-              console.log(
-                "Cardápio detectado pelo observer, scroll configurado"
-              );
-              observer.disconnect();
+                            observer.disconnect();
             }
           });
 
@@ -5790,8 +5403,7 @@ Variações: ${variacoesTexto.join(", ")}`;
           // Fallback com timeout para garantir que a inicialização ocorra
           setTimeout(() => {
             if (document.querySelector("#cardapio .categoria-secao")) {
-              console.log("Inicializando scroll via timeout");
-              setupScrollCentralization();
+                            setupScrollCentralization();
               observer.disconnect();
             }
           }, 2000);
@@ -5812,10 +5424,7 @@ Variações: ${variacoesTexto.join(", ")}`;
             categoryItems.length > 0 &&
             !document.querySelector(".category-item.active")
           ) {
-            console.log(
-              "Nenhum item ativo detectado durante scroll, reinicializando..."
-            );
-            setupScrollCentralization();
+                        setupScrollCentralization();
           }
         },
         { passive: true }
@@ -5824,8 +5433,7 @@ Variações: ${variacoesTexto.join(", ")}`;
     <script>
       // Carregar carrinho ao iniciar a página
       document.addEventListener("DOMContentLoaded", function () {
-        console.log("Carregando carrinho do localStorage");
-        atualizarContadorCarrinho();
+                atualizarContadorCarrinho();
       });
 
       // Função para atualizar o contador do carrinho
@@ -5837,8 +5445,7 @@ Variações: ${variacoesTexto.join(", ")}`;
           0
         );
 
-        console.log("Atualizando contador do carrinho:", totalItens, "itens");
-
+        
         // Container do carrinho flutuante
         const carrinhoFlutuante = document.getElementById("carrinho-flutuante");
         // Botão do carrinho dentro do container
@@ -5865,11 +5472,7 @@ Variações: ${variacoesTexto.join(", ")}`;
         );
         if (totalItensCarrinho) {
           totalItensCarrinho.textContent = totalItens;
-          console.log(
-            "Total de itens no título do carrinho atualizado para:",
-            totalItens
-          );
-        }
+                  }
 
         // Mostrar/esconder carrinho flutuante e garantir que o botão seja clicável
         if (carrinhoFlutuante && botaoCarrinho) {
@@ -5889,8 +5492,7 @@ Variações: ${variacoesTexto.join(", ")}`;
               !botaoCarrinho.getAttribute("onclick")
             ) {
               botaoCarrinho.setAttribute("onclick", "abrirModal();");
-              console.log("Adicionado evento onclick ao botão do carrinho");
-            }
+                          }
           } else {
             carrinhoFlutuante.style.opacity = "0.5";
             carrinhoFlutuante.classList.add("hidden");
@@ -5931,8 +5533,7 @@ Variações: ${variacoesTexto.join(", ")}`;
 
       // Funções para controlar o modal de checkout
       function abrirModal() {
-        console.log("Abrindo modal de checkout");
-        const modal = document.getElementById("modal-checkout");
+                const modal = document.getElementById("modal-checkout");
         if (modal) {
           // Bloquear o scroll da página antes de exibir o modal
           document.body.style.overflow = "hidden";
@@ -5956,18 +5557,12 @@ Variações: ${variacoesTexto.join(", ")}`;
               0
             );
             totalItensCarrinho.textContent = totalItens;
-            console.log(
-              "Total de itens atualizado para:",
-              totalItens,
-              "ao abrir o modal"
-            );
-          }
+                      }
         }
       }
 
       function fecharModal() {
-        console.log("Fechando modal de checkout");
-        const modal = document.getElementById("modal-checkout");
+                const modal = document.getElementById("modal-checkout");
         if (modal) {
           modal.classList.add("hidden");
           modal.style.display = "none";
@@ -5976,8 +5571,7 @@ Variações: ${variacoesTexto.join(", ")}`;
           // Restaurar o scroll da página
           document.body.style.overflow = "";
           document.body.classList.remove("overflow-hidden");
-          console.log("Scroll da página restaurado");
-        }
+                  }
       }
 
       // Variável para evitar chamadas recursivas
@@ -5988,13 +5582,11 @@ Variações: ${variacoesTexto.join(", ")}`;
         try {
           // Evitar chamadas recursivas
           if (isRenderizandoCarrinho) {
-            console.log("Renderização já em andamento, ignorando chamada");
-            return;
+                        return;
           }
 
           isRenderizandoCarrinho = true;
-          console.log("Renderizando itens do carrinho no modal");
-          const containerItens = document.getElementById("carrinho-itens");
+                    const containerItens = document.getElementById("carrinho-itens");
 
           if (!containerItens) {
             console.error("Container de itens do carrinho não encontrado");
@@ -6101,12 +5693,7 @@ Variações: ${variacoesTexto.join(", ")}`;
                           imagemSrc = img.getAttribute("src") || "";
                         }
 
-                        console.log(
-                          "Imagem encontrada no DOM para o item:",
-                          idBusca,
-                          imagemSrc
-                        );
-                      }
+                                              }
                     }
                   }
                 } catch (e) {
@@ -6253,12 +5840,10 @@ Variações: ${variacoesTexto.join(", ")}`;
       function salvarObservacaoItem(id, observacao) {
         // Verificar se o campo de observação está habilitado na configuração
         if (dadosGlobais.config["Step-1-itens-obs"] !== "Sim") {
-          console.log("Campo de observação desabilitado nas configurações");
-          return;
+                    return;
         }
 
-        console.log("Salvando observação para o item:", id, observacao);
-
+        
         // Obter carrinho do localStorage
         let carrinho = JSON.parse(localStorage.getItem("carrinho") || "[]");
 
@@ -6273,17 +5858,14 @@ Variações: ${variacoesTexto.join(", ")}`;
 
             // Salvar no localStorage
             localStorage.setItem("carrinho", JSON.stringify(carrinho));
-            console.log("Observação salva com sucesso");
-          } else {
-            console.log("Item não possui campo de observação");
-          }
+                      } else {
+                      }
         }
       }
 
       // Função para remover um item do carrinho
       function removerItemDoCarrinho(id) {
-        console.log(`Removendo item ${id} do carrinho`);
-
+        
         try {
           let carrinho = JSON.parse(localStorage.getItem("carrinho") || "[]");
 
@@ -6334,14 +5916,7 @@ Variações: ${variacoesTexto.join(", ")}`;
               0
             );
             totalItensCarrinho.textContent = totalItens;
-            console.log(
-              "Total de itens atualizado para:",
-              totalItens,
-              "após remover",
-              quantidadeRemovida,
-              "unidades"
-            );
-          }
+                      }
 
           // Exibir mensagem de feedback
           const mensagem = document.createElement("div");
@@ -6365,8 +5940,7 @@ Variações: ${variacoesTexto.join(", ")}`;
 
       // Função para alterar a quantidade de um item no carrinho
       function alterarQuantidadeItem(id, delta) {
-        console.log(`Alterando quantidade do item ${id} em ${delta}`);
-
+        
         try {
           // Obter carrinho do localStorage
           let carrinho = JSON.parse(localStorage.getItem("carrinho") || "[]");
@@ -6415,8 +5989,7 @@ Variações: ${variacoesTexto.join(", ")}`;
               0
             );
             totalItensCarrinho.textContent = totalItens;
-            console.log("Total de itens atualizado para:", totalItens);
-          }
+                      }
 
           // Feedback visual temporário
           const mensagem = document.createElement("div");
@@ -6438,10 +6011,7 @@ Variações: ${variacoesTexto.join(", ")}`;
 
       // Função para atualizar a quantidade a partir do campo de entrada
       function atualizarQuantidadeInput(id, novaQuantidade) {
-        console.log(
-          `Atualizando quantidade do item ${id} para ${novaQuantidade}`
-        );
-
+        
         try {
           // Converter para número e validar
           let quantidade = parseInt(novaQuantidade);
@@ -6495,8 +6065,7 @@ Variações: ${variacoesTexto.join(", ")}`;
               0
             );
             totalItensCarrinho.textContent = totalItens;
-            console.log("Total de itens atualizado para:", totalItens);
-          }
+                      }
 
           // Atualizar estado dos botões de decremento
           const decrementoButtons = document.querySelectorAll(
@@ -6576,8 +6145,7 @@ Variações: ${variacoesTexto.join(", ")}`;
 
       // Função para limpar todo o carrinho
       function limparCarrinho() {
-        console.log("Limpando todo o carrinho");
-
+        
         // Confirmar com o usuário
         if (
           confirm("Tem certeza que deseja remover todos os itens do carrinho?")
@@ -6586,12 +6154,10 @@ Variações: ${variacoesTexto.join(", ")}`;
             // Limpar o carrinho usando o objeto Carrinho se disponível
             if (typeof Carrinho === "object" && Carrinho.limpar) {
               Carrinho.limpar();
-              console.log("Carrinho limpo usando objeto Carrinho");
-            } else {
+                          } else {
               // Fallback: limpar localStorage diretamente
               localStorage.removeItem("carrinho");
-              console.log("Carrinho limpo usando localStorage diretamente");
-            }
+                          }
 
             // Garantir que o carrinho global seja limpo
             window.carrinho = [];
@@ -6608,10 +6174,7 @@ Variações: ${variacoesTexto.join(", ")}`;
             );
             if (totalItensCarrinho) {
               totalItensCarrinho.textContent = "0";
-              console.log(
-                "Total de itens atualizado para: 0 após limpar o carrinho"
-              );
-            }
+                          }
 
             // Renderizar o carrinho vazio (isso vai criar a mensagem de carrinho vazio)
             renderizarItensCarrinho();
@@ -6649,8 +6212,7 @@ Variações: ${variacoesTexto.join(", ")}`;
             document.body.style.overflow = "";
             document.body.classList.remove("overflow-hidden");
 
-            console.log("Carrinho limpo com sucesso");
-          } catch (error) {
+                      } catch (error) {
             console.error("Erro ao limpar o carrinho:", error);
             alert(
               "Ocorreu um erro ao limpar o carrinho. Por favor, tente novamente."
@@ -6676,8 +6238,7 @@ Variações: ${variacoesTexto.join(", ")}`;
             numero = 1; // Valor padrão seguro
           }
 
-          console.log(`Mostrando step ${numero}`);
-          stepAtual = numero; // Atualizar variável global
+                    stepAtual = numero; // Atualizar variável global
 
           // Esconder todos os steps
           document.querySelectorAll(".step").forEach((step) => {
@@ -6808,8 +6369,7 @@ Variações: ${variacoesTexto.join(", ")}`;
 
       // Função para avançar para o próximo step
       function avancarStep() {
-        console.log("Avançando para o próximo step");
-
+        
         // Verificar se há itens no carrinho
         const carrinho = JSON.parse(localStorage.getItem("carrinho") || "[]");
         if (carrinho.length === 0) {
@@ -6844,8 +6404,7 @@ Variações: ${variacoesTexto.join(", ")}`;
       // Função para voltar ao step anterior
       function voltarStep() {
         try {
-          console.log("Voltando para o step anterior");
-
+          
           // Verificar se estamos no primeiro step
           if (stepAtual <= 1) {
             stepAtual = 1; // Garantir que não seja menor que 1
@@ -6892,8 +6451,7 @@ Variações: ${variacoesTexto.join(", ")}`;
 
       // Função para resetar o formulário
       function resetarFormulario() {
-        console.log("Resetando formulário");
-
+        
         // Limpar campos do formulário
         const formCliente = document.getElementById("form-cliente");
         if (formCliente) {
@@ -7014,8 +6572,7 @@ Variações: ${variacoesTexto.join(", ")}`;
       let opcaoEntregaPadrao = false;
 
       function selecionarOpcaoEntrega(opcao) {
-        console.log("Selecionando opção de entrega:", opcao);
-        opcaoEntregaSelecionada = opcao;
+                opcaoEntregaSelecionada = opcao;
 
         // Verificar se é a opção 4 (padrão)
         opcaoEntregaPadrao = opcao === "padrao";
@@ -7078,8 +6635,7 @@ Variações: ${variacoesTexto.join(", ")}`;
             selectFormaPagamento.appendChild(option);
           });
 
-          console.log("Formas de pagamento carregadas:", formasPagamento);
-        } else {
+                  } else {
           console.warn("Configuração de formas de pagamento não encontrada");
 
           // Adicionar opções padrão caso não haja configuração
@@ -7101,11 +6657,7 @@ Variações: ${variacoesTexto.join(", ")}`;
         if (!selectFormaPagamento.hasAttribute("data-event-attached")) {
           selectFormaPagamento.addEventListener("change", function () {
             formaPagamentoSelecionada = this.value;
-            console.log(
-              "Forma de pagamento selecionada salva:",
-              formaPagamentoSelecionada
-            );
-          });
+                      });
           selectFormaPagamento.setAttribute("data-event-attached", "true");
         }
 
@@ -7122,8 +6674,7 @@ Variações: ${variacoesTexto.join(", ")}`;
 
           if (valorExiste) {
             selectFormaPagamento.value = valorAtual;
-            console.log("Valor da forma de pagamento restaurado:", valorAtual);
-          } else {
+                      } else {
             console.warn(
               "Valor anterior não encontrado nas opções atuais:",
               valorAtual
@@ -7155,23 +6706,15 @@ Variações: ${variacoesTexto.join(", ")}`;
             // Verifica se contém apenas números
             if (!/^\d+$/.test(paste)) {
               e.preventDefault();
-              console.log("Tentativa de colar texto não numérico bloqueada");
-            }
+                          }
           });
 
-          console.log(
-            "Campo mesa-comanda configurado para aceitar apenas números"
-          );
-        }
+                  }
       }
 
       // Função para mostrar campos específicos no step 3
       function mostrarCamposEspecificos() {
-        console.log(
-          "Mostrando campos específicos para:",
-          opcaoEntregaSelecionada
-        );
-
+        
         try {
           // Esconder todos os campos específicos
           document.querySelectorAll(".campos-opcao").forEach((campo) => {
@@ -7329,10 +6872,7 @@ Variações: ${variacoesTexto.join(", ")}`;
             if (opcaoEntregaSelecionada === "local") {
               // Se for "Consumo no Local", NUNCA mostrar o campo de forma de pagamento
               mostrarFormaPagamento = false;
-              console.log(
-                'Campo de forma de pagamento ocultado porque a opção selecionada é "Consumo no Local"'
-              );
-
+              
               // Ocultar também os campos relacionados ao troco
               const containerTroco = document.getElementById("container-troco");
               const campoValorTroco =
@@ -7346,10 +6886,7 @@ Variações: ${variacoesTexto.join(", ")}`;
                 campoValorTroco.classList.add("hidden");
               }
 
-              console.log(
-                'Campos de troco ocultados porque a opção selecionada é "Consumo no Local"'
-              );
-            } else {
+                          } else {
               // Para as outras opções (delivery/retirada), verificar a configuração da planilha
               if (
                 window.dadosGlobais &&
@@ -7431,8 +6968,7 @@ Variações: ${variacoesTexto.join(", ")}`;
 
       // Função para finalizar o pedido
       function finalizarPedido() {
-        console.log("Finalizando pedido");
-
+        
         // Obter dados do formulário
         const nomeCliente = document
           .getElementById("nome-cliente")
@@ -7647,15 +7183,7 @@ Variações: ${variacoesTexto.join(", ")}`;
         const isWindows = /Windows/i.test(navigator.userAgent);
         const isDesktop = !isMobile;
 
-        console.log("Enviando pedido, dispositivo detectado:", {
-          isMobile,
-          isIOS,
-          isMac,
-          isWindows,
-          userAgent: navigator.userAgent,
-        });
-        console.log("Número de destino:", numero);
-
+                
         try {
           // Verificar o formato do número e adicionar prefixo se necessário
           if (numero.length === 11 || numero.length === 10) {
@@ -7667,8 +7195,7 @@ Variações: ${variacoesTexto.join(", ")}`;
           const webUrl = `https://api.whatsapp.com/send?phone=${numero}&text=${mensagem}`;
 
           // Registro de log para depuração
-          console.log("URL de envio:", webUrl);
-
+          
           // Abrir em nova janela com fallback para mesma janela
           try {
             const newWindow = window.open(webUrl, "_blank");
@@ -7678,8 +7205,7 @@ Variações: ${variacoesTexto.join(", ")}`;
               typeof newWindow.closed === "undefined"
             ) {
               // Se falhar ao abrir em nova janela, tentar na mesma janela
-              console.log("Fallback: Abrindo na mesma janela");
-              window.location.href = webUrl;
+                            window.location.href = webUrl;
             }
             return true;
           } catch (innerError) {
@@ -7693,8 +7219,7 @@ Variações: ${variacoesTexto.join(", ")}`;
           // Tentar método alternativo wa.me
           try {
             const waUrl = `https://wa.me/${numero}?text=${mensagem}`;
-            console.log("Tentando método alternativo:", waUrl);
-            alert("Usando método alternativo para abrir o WhatsApp.");
+                        alert("Usando método alternativo para abrir o WhatsApp.");
             window.location.href = waUrl;
             return true;
           } catch (fallbackError) {
@@ -7720,12 +7245,7 @@ Variações: ${variacoesTexto.join(", ")}`;
         botao,
         precoAdicional = 0
       ) {
-        console.log("Adicionando ao carrinho simplificado:", {
-          id,
-          titulo,
-          precoAdicional,
-        });
-
+        
         // Obter quantidade do input associado
         const input = document.querySelector(
           `.quantidade-input[data-item-id="${id}"]`
@@ -7795,10 +7315,8 @@ Variações: ${variacoesTexto.join(", ")}`;
           if (imagemURL) {
             // Processar a URL da imagem para suportar Google Drive
             imagemURL = processarURLImagem(imagemURL);
-            console.log("Imagem processada para o carrinho:", imagemURL);
-          } else {
-            console.log("Nenhuma imagem encontrada para o item");
-          }
+                      } else {
+                      }
         } catch (e) {
           console.error("Erro ao obter imagem do item:", e);
         }
@@ -7848,8 +7366,7 @@ Variações: ${variacoesTexto.join(", ")}`;
           ...(incluirObservacao ? { observacao: "" } : {}),
         });
 
-        console.log(`Item adicionado com quantidade ${quantidade}:`, titulo);
-
+        
         // Salvar no localStorage
         localStorage.setItem("carrinho", JSON.stringify(carrinho));
 
@@ -7867,12 +7384,7 @@ Variações: ${variacoesTexto.join(", ")}`;
             0
           );
           totalItensCarrinho.textContent = totalItens;
-          console.log(
-            "Total de itens atualizado para:",
-            totalItens,
-            "após adicionar item"
-          );
-        }
+                  }
 
         // Feedback visual
         const textoSpan = botao.querySelector("span");
@@ -7912,8 +7424,7 @@ Variações: ${variacoesTexto.join(", ")}`;
       // Função removida pois agora o menu desktop é o mesmo que o mobile
       function setupDesktopScrollNavigation() {
         // Removida pois agora usamos o mesmo menu para desktop e mobile
-        console.log("Menu desktop agora usa o mesmo comportamento do mobile");
-      }
+              }
 
       // Aguarda o cardápio ser renderizado antes de inicializar
       document.addEventListener("DOMContentLoaded", () => {
@@ -7961,8 +7472,7 @@ Variações: ${variacoesTexto.join(", ")}`;
          * - Atualiza contadores visuais
          */
         inicializar: function () {
-          console.log("Inicializando sistema de carrinho...");
-          this.carregarDoLocalStorage();
+                    this.carregarDoLocalStorage();
           this.atualizarContadorCarrinho();
           this.atualizarBotaoFlutuante();
           this.configurarEventos();
@@ -8003,10 +7513,7 @@ Variações: ${variacoesTexto.join(", ")}`;
           );
           if (totalItensCarrinho) {
             totalItensCarrinho.textContent = "0";
-            console.log(
-              "Total de itens atualizado para: 0 após limpar o carrinho"
-            );
-          }
+                      }
         },
 
         /**
@@ -8019,13 +7526,7 @@ Variações: ${variacoesTexto.join(", ")}`;
          *              Salva o carrinho no localStorage e atualiza a exibição do carrinho.
          */
         adicionar: function (id, titulo, quantidade, observacao = "") {
-          console.log("[Carrinho] adicionar chamado", {
-            id,
-            titulo,
-            quantidade,
-            observacao,
-          });
-          // Validar quantidade
+                    // Validar quantidade
           quantidade = parseInt(quantidade) || 1;
           if (quantidade < 1) quantidade = 1;
 
@@ -8061,12 +7562,7 @@ Variações: ${variacoesTexto.join(", ")}`;
               0
             );
             totalItensCarrinho.textContent = totalItens;
-            console.log(
-              "Total de itens atualizado para:",
-              totalItens,
-              "após adicionar/atualizar item"
-            );
-          }
+                      }
 
           // Atualiza estado visual do botão
           this.atualizarEstadoBotaoAdicionar(id);
@@ -8098,14 +7594,7 @@ Variações: ${variacoesTexto.join(", ")}`;
               0
             );
             totalItensCarrinho.textContent = totalItens;
-            console.log(
-              "Total de itens atualizado para:",
-              totalItens,
-              "após remover",
-              quantidadeRemovida,
-              "unidades"
-            );
-          }
+                      }
 
           // Resetar estado visual do botão
           const botao = document.querySelector(
@@ -8158,8 +7647,7 @@ Variações: ${variacoesTexto.join(", ")}`;
             totalItensCarrinho.textContent = totalItens;
           }
 
-          console.log("Atualizando contador do carrinho:", totalItens);
-        },
+                  },
 
         /**
          * Atualiza a visibilidade do botão flutuante do carrinho
@@ -8169,15 +7657,7 @@ Variações: ${variacoesTexto.join(", ")}`;
         atualizarBotaoFlutuante: function () {
           // ID correto do botão é 'botao-carrinho', não 'carrinho-flutuante'
           const botaoFlutuante = document.getElementById("botao-carrinho");
-          console.log(
-            "[Carrinho] atualizarBotaoFlutuante chamado, itens:",
-            this.itens,
-            "length:",
-            this.itens.length,
-            "DOM:",
-            botaoFlutuante
-          );
-
+          
           if (!botaoFlutuante) {
             console.error("Botão do carrinho não encontrado no DOM!");
             return;
@@ -8197,8 +7677,7 @@ Variações: ${variacoesTexto.join(", ")}`;
               !botaoFlutuante.getAttribute("onclick")
             ) {
               botaoFlutuante.setAttribute("onclick", "abrirModal();");
-              console.log("Adicionado evento onclick ao botão do carrinho");
-            }
+                          }
 
             // Atualizar contador do carrinho
             const contadorCarrinho =
@@ -8242,8 +7721,7 @@ Variações: ${variacoesTexto.join(", ")}`;
          * - Mostra mensagem de carrinho vazio se não houver itens
          */
         renderizarItensCarrinho: function () {
-          console.log("Renderizando itens do carrinho no modal");
-          const containerItens = document.getElementById("carrinho-itens");
+                    const containerItens = document.getElementById("carrinho-itens");
           const carrinhoVazio = document.getElementById("carrinho-vazio");
 
           if (!containerItens) {
@@ -8593,8 +8071,7 @@ Variações: ${variacoesTexto.join(", ")}`;
                     itemElement.remove();
                   }
 
-                  console.log("Item removido do carrinho:", id);
-                }
+                                  }
               } catch (error) {
                 console.error("Erro ao remover item do carrinho:", error);
               }
@@ -8634,8 +8111,7 @@ Variações: ${variacoesTexto.join(", ")}`;
                   step3.classList.add("hidden");
                 }
 
-                console.log("Carrinho limpo com sucesso");
-              } catch (error) {
+                              } catch (error) {
                 console.error("Erro ao limpar carrinho:", error);
               }
             }
@@ -8764,8 +8240,7 @@ Variações: ${variacoesTexto.join(", ")}`;
               0
             );
             totalItensCarrinho.textContent = totalItens;
-            console.log("Total de itens no carrinho:", totalItens);
-          }
+                      }
 
           // Remover todos os itens, exceto a mensagem de carrinho vazio
           Array.from(carrinhoItens.children).forEach((child) => {
@@ -8872,10 +8347,7 @@ Variações: ${variacoesTexto.join(", ")}`;
             case "local":
               // Campo Mesa/Comanda (sempre exibir quando a opção for 'local')
               // A configuração Step-3-mesa-comanda está definida como Sim na planilha
-              console.log(
-                "Configurando campo de mesa/comanda para opção local"
-              );
-              const campoMesa = document.createElement("div");
+                            const campoMesa = document.createElement("div");
               campoMesa.className = "mb-4";
               campoMesa.innerHTML = `
                             <label for="cliente-mesa" class="block mb-1 text-sm font-medium text-gray-700">Mesa/Comanda</label>
@@ -9202,8 +8674,7 @@ Variações: ${variacoesTexto.join(", ")}`;
               modal.style.position = "";
             });
 
-            console.log("Sistema resetado após envio do pedido");
-          };
+                      };
 
           // Executar a limpeza após um pequeno delay para garantir que o WhatsApp foi aberto
           setTimeout(limparTudoEResetar, 500);
@@ -9218,10 +8689,7 @@ Variações: ${variacoesTexto.join(", ")}`;
         // Observa quando o cardápio é renderizado para configurar todos os eventos novamente
         const observer = new MutationObserver(function (mutations, observer) {
           if (document.querySelector("#cardapio .categoria-secao")) {
-            console.log(
-              "Cardápio renderizado, configurando eventos do carrinho..."
-            );
-            // Reconfigurar eventos para os novos elementos adicionados ao DOM
+                        // Reconfigurar eventos para os novos elementos adicionados ao DOM
             Carrinho.configurarEventos();
             observer.disconnect();
           }
@@ -9323,10 +8791,7 @@ Variações: ${variacoesTexto.join(", ")}`;
 
       // Adicionar botão flutuante de compartilhamento geral após o carregamento do DOM
       document.addEventListener("DOMContentLoaded", function () {
-        console.log(
-          "DOM carregado - Inicializando funcionalidades de compartilhamento"
-        );
-
+        
         // Criar o botão flutuante para compartilhar o site
         const botaoCompartilharGeral = document.createElement("button");
         botaoCompartilharGeral.className = "btn-compartilhar-geral";
@@ -9348,10 +8813,7 @@ Variações: ${variacoesTexto.join(", ")}`;
 
         // Verificar se o cardápio já está carregado
         if (document.querySelector(".categoria-secao")) {
-          console.log(
-            "Cardápio já está carregado - Adicionando botões de compartilhamento imediatamente"
-          );
-          setTimeout(adicionarBotoesCompartilharCategorias, 500); // Pequeno delay para garantir que as imagens estão carregadas
+                    setTimeout(adicionarBotoesCompartilharCategorias, 500); // Pequeno delay para garantir que as imagens estão carregadas
         }
 
         // Observar o cardápio para adicionar botões de compartilhamento às categorias
@@ -9361,16 +8823,12 @@ Variações: ${variacoesTexto.join(", ")}`;
               mutation.type === "childList" &&
               document.querySelector(".categoria-secao")
             ) {
-              console.log(
-                "Mutação detectada no cardápio - Adicionando botões de compartilhamento"
-              );
-              // Adicionar botões de compartilhamento nas imagens das categorias com um pequeno delay
+                            // Adicionar botões de compartilhamento nas imagens das categorias com um pequeno delay
               // para garantir que as imagens estão completamente carregadas
               setTimeout(adicionarBotoesCompartilharCategorias, 500);
               // Desconectar o observer após adicionar os botões
               observerCardapio.disconnect();
-              console.log("Observer desconectado após adicionar botões");
-              break;
+                            break;
             }
           }
         });
@@ -9378,8 +8836,7 @@ Variações: ${variacoesTexto.join(", ")}`;
         // Iniciar a observação do cardápio
         const cardapioElement = document.getElementById("cardapio");
         if (cardapioElement) {
-          console.log("Iniciando observação do cardápio");
-          observerCardapio.observe(cardapioElement, {
+                    observerCardapio.observe(cardapioElement, {
             childList: true,
             subtree: true,
           });
@@ -9391,31 +8848,19 @@ Variações: ${variacoesTexto.join(", ")}`;
 
         // Adicionar um listener para o evento de carregamento completo da página
         window.addEventListener("load", function () {
-          console.log(
-            "Página totalmente carregada - Verificando botões de compartilhamento"
-          );
-          // Verificar se os botões já foram adicionados, caso contrário adicionar
+                    // Verificar se os botões já foram adicionados, caso contrário adicionar
           if (!document.querySelector(".btn-compartilhar-categoria")) {
-            console.log(
-              "Botões de compartilhamento não encontrados - Adicionando agora"
-            );
-            setTimeout(adicionarBotoesCompartilharCategorias, 500);
+                        setTimeout(adicionarBotoesCompartilharCategorias, 500);
           }
         });
       });
 
       // Adicionar botões de compartilhamento nas categorias
       function adicionarBotoesCompartilharCategorias() {
-        console.log(
-          "Iniciando adição de botões de compartilhamento nas categorias..."
-        );
-
+        
         // Selecionar todas as seções de categorias
         const categorias = document.querySelectorAll(".categoria-secao");
-        console.log(
-          `Encontradas ${categorias.length} categorias para adicionar botões`
-        );
-
+        
         categorias.forEach((categoria, index) => {
           // Encontrar a imagem da categoria diretamente dentro da div mb-8
           const divContainer = categoria.querySelector(".mb-8");
@@ -9423,12 +8868,7 @@ Variações: ${variacoesTexto.join(", ")}`;
             ? divContainer.querySelector("img")
             : null;
 
-          console.log(
-            `Categoria ${index + 1}: ${categoria.id} - Imagem encontrada: ${
-              imagemContainer ? "Sim" : "Não"
-            }`
-          );
-
+          
           if (imagemContainer) {
             // Verificar se a imagem já está dentro de um container
             const parentElement = imagemContainer.parentElement;
@@ -9438,8 +8878,7 @@ Variações: ${variacoesTexto.join(", ")}`;
             if (
               parentElement.classList.contains("categoria-imagem-container")
             ) {
-              console.log(`Container já existe para categoria ${index + 1}`);
-              container = parentElement;
+                            container = parentElement;
               // Remover botão existente se houver
               const botaoExistente = container.querySelector(
                 ".btn-compartilhar-categoria"
@@ -9455,8 +8894,7 @@ Variações: ${variacoesTexto.join(", ")}`;
               // Mover a imagem para o novo container
               parentElement.insertBefore(container, imagemContainer);
               container.appendChild(imagemContainer);
-              console.log(`Criado novo container para categoria ${index + 1}`);
-            }
+                          }
 
             // Garantir que o container tenha position: relative
             container.style.position = "relative";
@@ -9515,10 +8953,7 @@ Variações: ${variacoesTexto.join(", ")}`;
 
             // Adicionar o botão ao container
             container.appendChild(botaoCompartilhar);
-            console.log(
-              `Botão de compartilhamento adicionado para categoria ${index + 1}`
-            );
-          }
+                      }
         });
       }
     </script>
@@ -9542,8 +8977,7 @@ Variações: ${variacoesTexto.join(", ")}`;
 
         // Se não houver URL de imagem válida, não abrir o modal
         if (!imagemUrl || imagemUrl === "") {
-          console.log("Imagem não disponível para ampliação");
-          return;
+                    return;
         }
 
         // Definir a imagem no modal
