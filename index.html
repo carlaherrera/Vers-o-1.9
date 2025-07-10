@@ -85,7 +85,7 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
-
+    <link rel="stylesheet" href="css/style.css" />
     <style>
       /* Variáveis CSS dinâmicas para cores da planilha */
       :root {
@@ -1180,28 +1180,7 @@
   </head>
   <body class="gradient-bg min-h-screen" onload="window.scrollTo(0, 0);">
     <!-- Script para garantir que a página carregue no topo quando recarregada -->
-    <script>
-      // Verificar se há parâmetro scrollTop na URL
-      if (window.location.href.includes("scrollTop=0")) {
-        // Forçar rolagem para o topo
-        window.scrollTo(0, 0);
-
-        // Remover o parâmetro da URL para não acumular parâmetros
-        const urlSemParam = window.location.href.replace(
-          /[?&]scrollTop=0(&|$)/,
-          "$1"
-        );
-        const urlLimpa =
-          urlSemParam.endsWith("?") || urlSemParam.endsWith("&")
-            ? urlSemParam.slice(0, -1)
-            : urlSemParam;
-
-        // Atualizar a URL sem recarregar a página
-        if (urlLimpa !== window.location.href) {
-          history.replaceState(null, "", urlLimpa);
-        }
-      }
-    </script>
+    <script src="js/init.js"></script>
     <!-- Loading Screen -->
     <div
       id="loading"
@@ -1948,15 +1927,8 @@
                   >
                 </div>
               </div>
-              <script>
-                // Renderizar itens do carrinho quando o modal for aberto
-                document
-                  .getElementById("botao-carrinho")
-                  .addEventListener("click", function () {
-                    renderizarItensCarrinho();
-                  });
-              </script>
             </div>
+              <script src="js/cart-open.js"></script>
 
             <!-- Step 2: Onde receber o pedido -->
             <div id="step-2" class="step hidden">
@@ -2293,34 +2265,13 @@
         <!-- Fim do conteúdo do modal -->
       </div>
     </div>
+    <script src="js/cardapio.js"></script>
+    <!-- Script para gerenciar o carregamento de imagens -->
+    <script src="js/image-loader.js"></script>
 
-    <script>
-      // URLs das planilhas (carregadas do arquivo config.js)
-      const URLS = CONFIG_PLANILHAS;
-
-      let dadosGlobais = {
-        categorias: [],
-        itens: [],
-        config: {},
-      };
-
-      // Variáveis para o sistema de busca
-      let todosItens = [];
-      let searchTimeout;
-
-      // Função utilitária para normalizar URLs de imagens, incluindo links de compartilhamento do Google Drive
-      // Função removida conforme solicitado
-
-      // Função para converter CSV em array de objetos com suporte a quebras de linha dentro de campos
-      function csvToArray(csv) {
-        // Pré-processamento para lidar com quebras de linha em campos entre aspas
-        let processedCSV = "";
-        let inQuotes = false;
-
-        // Primeiro passo: transformar quebras de linha dentro de aspas em um marcador especial
-        for (let i = 0; i < csv.length; i++) {
-          const char = csv[i];
-
+    <!-- Script para centralizar o item do menu durante o scroll (estilo iFood com navegação por âncoras) -->
+    <script src="js/cart-utils.js"></script>
+    <script src="js/desktop-scroll.js"></script>
           if (char === '"') {
             inQuotes = !inQuotes;
             processedCSV += char;
@@ -7452,6 +7403,7 @@ Variações: ${variacoesTexto.join(", ")}`;
     <!-- Sistema de Carrinho e Checkout -->
     <!-- Autor: Dante Testa (https://dantetesta.com.br) -->
     <!-- Implementação de carrinho de compras responsivo com abordagem Mobile First e fluxo de checkout em steps -->
+    <script src="js/cart-system.js"></script>
     <script>
       /**
        * Sistema de Carrinho de Compras
@@ -8964,7 +8916,6 @@ Variações: ${variacoesTexto.join(", ")}`;
         });
       }
     </script>
-    
     <!-- Modal para exibição de imagem ampliada -->
     <div id="imageModal" class="image-modal">
       <div class="modal-content">
@@ -8973,6 +8924,10 @@ Variações: ${variacoesTexto.join(", ")}`;
       </div>
     </div>
 
+    <script src="js/modal-image.js"></script>
+  </body>
+<!-- Updated to ensure menu scroll works and scripts load without errors -->
+</html>
     <!-- Script para controlar o modal de imagem -->
     <script>
       // Função para abrir o modal de imagem

@@ -1,0 +1,1088 @@
+      /* Variáveis CSS dinâmicas para cores da planilha */
+      :root {
+        --primary-color: #0d9488; /* Cor padrão (teal-600) */
+        --primary-color-rgb: 13, 148, 136; /* Valores RGB da cor primária */
+        --secondary-color: #0f766e; /* Cor secundária (teal-700) */
+        --secondary-color-rgb: 15, 118, 110; /* Valores RGB da cor secundária */
+        --accent-color: #14b8a6; /* Cor de destaque (teal-500) */
+        --skeleton-base-color: #e5e7eb; /* Cor base do skeleton (gray-200) */
+        --skeleton-highlight-color: #f3f4f6; /* Cor de destaque do skeleton (gray-100) */
+        --cor-primaria: #8b4513;
+        --cor-primaria-rgb: 139, 69, 19; /* Valores RGB da cor primária */
+        --cor-secundaria: #d2691e;
+        --cor-secundaria-rgb: 210, 105, 30; /* Valores RGB da cor secundária */
+        --cor-skeleton: #e2e8f0; /* Cor base para o skeleton loading */
+        --cor-fundo: #f8fafc;
+        --cor-texto: #333333;
+        --cor-links: #8b4513;
+        --cor-texto-rodape: #ffffff;
+      }
+
+      /* Ocultar spinners (setas) dos campos de entrada numérica */
+      /* Para todos os navegadores */
+      input[type="number"] {
+        -moz-appearance: textfield;
+        -webkit-appearance: textfield;
+        appearance: textfield;
+      }
+      /* Para Chrome, Safari, Edge, Opera */
+      input[type="number"]::-webkit-outer-spin-button,
+      input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        appearance: none;
+        margin: 0;
+      }
+
+      /* Estilos aplicados somente quando houver tentativa de adicionar sem selecionar */
+      .variacoes-container.erro-obrigatorio {
+        animation: pulse-border 2s infinite;
+        border: 2px solid #ef4444;
+        border-radius: 8px;
+        padding: 8px;
+        margin-bottom: 12px;
+      }
+
+      @keyframes pulse-border {
+        0% {
+          box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+        }
+        70% {
+          box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+        }
+      }
+
+      /* Garanta que as variações obrigatórias tenham um ícone de alerta */
+      .variacoes-container[data-required="true"]::before {
+        content: "⚠️ ";
+        color: #ef4444;
+        margin-right: 5px;
+      }
+
+      /* Animações personalizadas */
+
+      /* Ajuste para âncoras - offset para compensar o menu fixo */
+      [id] {
+        scroll-margin-top: 170px; /* Offset para o menu fixo */
+        scroll-padding-top: 170px; /* Compatibilidade adicional */
+      }
+
+      /* Classe auxiliar para elementos de categoria que são alvos de âncoras */
+      .categoria-secao {
+        scroll-margin-top: 170px;
+        padding-top: 10px; /* Espaçamento adicional para melhor visualização */
+      }
+
+      .menu-transition {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* Animações para mensagens de feedback */
+      @keyframes fadeInOut {
+        0% {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        10% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        90% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+      }
+
+      @keyframes fadeOut {
+        0% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+      }
+
+      .animate-fade-in-out {
+        animation: fadeInOut 2.5s ease-in-out;
+      }
+
+      .animate-fade-out {
+        animation: fadeOut 0.5s ease-in-out forwards;
+      }
+
+      /* Animação para o contador do carrinho */
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.2);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .animate-pulse {
+        animation: pulse 1s ease-in-out infinite;
+      }
+
+      /* Estilos para o skeleton loading de imagens - versão premium */
+      .image-skeleton {
+        position: relative;
+        overflow: hidden;
+        border-radius: 0.375rem;
+        background-color: rgba(var(--cor-primaria-rgb, 139, 69, 19), 0.15);
+      }
+
+      /* Efeito de gradiente deslizante */
+      .image-skeleton::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -150%;
+        width: 150%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(var(--cor-secundaria-rgb, 210, 105, 30), 0.25) 15%,
+          rgba(255, 255, 255, 0.6) 30%,
+          rgba(var(--cor-secundaria-rgb, 210, 105, 30), 0.25) 45%,
+          transparent
+        );
+        animation: shimmer 2s infinite;
+        z-index: 1;
+        transform: skewX(-20deg);
+      }
+
+      /* Efeito de pulso */
+      .image-skeleton::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at center,
+          rgba(255, 255, 255, 0.3) 0%,
+          rgba(255, 255, 255, 0) 70%
+        );
+        opacity: 0;
+        animation: pulse-glow 2.5s infinite ease-in-out;
+        z-index: 2;
+      }
+
+      @keyframes shimmer {
+        0% {
+          left: -150%;
+        }
+        100% {
+          left: 150%;
+        }
+      }
+
+      @keyframes pulse-glow {
+        0% {
+          opacity: 0;
+          transform: scale(0.85);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: scale(0.85);
+        }
+      }
+
+      /* Estilo para imagem em carregamento */
+      .img-loading {
+        opacity: 0;
+        transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* Estilo para imagem carregada */
+      .img-loaded {
+        opacity: 1;
+        z-index: 5;
+        position: relative;
+        animation: reveal 0.7s cubic-bezier(0.26, 0.86, 0.44, 0.985) forwards;
+      }
+
+      /* Animação de revelação da imagem */
+      @keyframes reveal {
+        0% {
+          opacity: 0;
+          transform: scale(0.92);
+          filter: blur(5px) brightness(1.2);
+        }
+        60% {
+          opacity: 1;
+          filter: blur(0) brightness(1.05);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1);
+          filter: blur(0) brightness(1);
+        }
+      }
+
+      .logo-hover {
+        transition: transform 0.2s ease-in-out;
+      }
+
+      .logo-hover:hover {
+        transform: scale(1.05);
+      }
+
+      /* Estilos para os radio buttons personalizados */
+      .radio-circle {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid #d1d5db;
+        position: relative;
+        transition: all 0.2s ease;
+      }
+
+      .radio-circle.selected {
+        border-color: var(--cor-primaria, #ff6b6b);
+      }
+
+      .radio-circle.selected:after {
+        content: "";
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: var(--cor-primaria, #ff6b6b);
+        border-radius: 50%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      .opcao-entrega.selected {
+        border-color: var(--cor-primaria, #ff6b6b);
+        background-color: rgba(var(--cor-primaria-rgb, 255, 107, 107), 0.05);
+      }
+
+      /* Smooth scroll */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* Loading animation */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .fade-in {
+        animation: fadeIn 0.6s ease-out;
+      }
+
+      /* Animações para transição entre steps */
+      @keyframes slideInRight {
+        from {
+          opacity: 0;
+          transform: translateX(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes slideInLeft {
+        from {
+          opacity: 0;
+          transform: translateX(-30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes slideOutRight {
+        from {
+          opacity: 1;
+          transform: translateX(0);
+        }
+        to {
+          opacity: 0;
+          transform: translateX(30px);
+        }
+      }
+
+      @keyframes slideOutLeft {
+        from {
+          opacity: 1;
+          transform: translateX(0);
+        }
+        to {
+          opacity: 0;
+          transform: translateX(-30px);
+        }
+      }
+
+      .step {
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .step.hidden {
+        display: none;
+      }
+
+      .step.slide-in-right {
+        animation: slideInRight 0.3s forwards;
+      }
+
+      .step.slide-in-left {
+        animation: slideInLeft 0.3s forwards;
+      }
+
+      .step.slide-out-right {
+        animation: slideOutRight 0.3s forwards;
+      }
+
+      .step.slide-out-left {
+        animation: slideOutLeft 0.3s forwards;
+      }
+
+      /* Gradientes dinâmicos */
+      .gradient-bg {
+        background: var(--cor-fundo);
+      }
+
+      /* Cards com hover effect - Design atualizado */
+      .card-hover {
+        transition: all 0.3s ease;
+        will-change: transform;
+        transform: translateZ(0) scale(1);
+        border: 1px solid transparent;
+      }
+
+      .card-hover:hover {
+        transform: translateZ(0) scale(1.02); /* Efeito de zoom suave */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08); /* Sombra delicada */
+        border: 1px solid rgba(0, 0, 0, 0.1); /* Bordinha cinza sutil */
+        z-index: 2; /* Garante que o card em hover fique acima dos outros */
+      }
+
+      /* Espaçamento para cards em dispositivos móveis */
+      .menu-item-mobile-spacing {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        border-radius: 0 !important;
+      }
+
+      /* Regra adicional para garantir que não haja espaçamento entre os cards em dispositivos móveis */
+      @media (max-width: 767px) {
+        .menu-item + .menu-item {
+          margin-top: 0 !important;
+          border-top: 0;
+        }
+
+        .grid.grid-cols-1 {
+          row-gap: 0 !important;
+        }
+      }
+
+      /* Estilos para o skeleton loading das imagens */
+      .image-skeleton {
+        position: relative;
+        background-color: var(--cor-skeleton);
+        overflow: hidden;
+      }
+
+      .image-skeleton::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.5),
+          transparent
+        );
+        animation: skeleton-loading 1.5s infinite;
+      }
+
+      @keyframes skeleton-loading {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(100%);
+        }
+      }
+
+      /* Classe para controlar a visibilidade da imagem durante o carregamento */
+      .img-loading {
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+      }
+
+      .img-loaded {
+        opacity: 1;
+      }
+
+      @media (max-width: 767px) {
+        .menu-item {
+          margin-top: 10px;
+          margin-bottom: 10px;
+        }
+      }
+
+      /* Estilos para o novo design de cards */
+      .menu-item-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+
+      .menu-item-row {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        height: 100%;
+      }
+
+      .menu-item-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        flex-grow: 1;
+        min-width: 0; /* Para evitar overflow de texto */
+      }
+
+      .menu-item-title-price {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      /* Estilos para o design estilo iFood com sanfona para mobile */
+      @media only screen and (max-width: 767px) {
+        .menu-item {
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .menu-item-mobile-view {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          padding: 12px;
+          position: relative;
+        }
+
+        .menu-item-mobile-image {
+          width: 100px;
+          height: 100px;
+          object-fit: cover;
+          border-radius: 8px;
+          margin-right: 8px;
+          flex-shrink: 0;
+        }
+
+        /* Estilos para o container da imagem com lupa */
+        .image-container {
+          position: relative;
+          display: inline-block;
+          padding-right: 8px;
+          margin-right: 4px;
+          flex-shrink: 0;
+        }
+
+        /* Ícone de lupa para ampliar imagem */
+        .zoom-icon {
+          position: absolute;
+          bottom: 1px;
+          right: 17px;
+          background-color: rgba(255, 255, 255, 0.8);
+          border-radius: 8px 0 7px 0;
+          width: 34px; /* Aumentado em 20% de 28px */
+          height: 34px; /* Aumentado em 20% de 28px */
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          color: var(--cor-primaria);
+
+          z-index: 2;
+          transition: all 0.2s ease;
+        }
+
+        .zoom-icon i {
+          font-size: 16px; /* Aumentado em ~20% de 14px */
+        }
+
+        .zoom-icon:hover {
+          background-color: white;
+        }
+
+        /* Modal para exibir a imagem ampliada */
+        .image-modal {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.85);
+          z-index: 1000;
+          justify-content: center;
+          align-items: center;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+
+        .image-modal.active {
+          display: flex;
+          opacity: 1;
+        }
+
+        .modal-content {
+          position: relative;
+          max-width: 90%;
+          max-height: 90%;
+          animation: zoomIn 0.3s ease;
+        }
+
+        @keyframes zoomIn {
+          from {
+            transform: scale(0.8);
+            opacity: 0;
+          }
+          to {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+
+        .modal-image {
+          max-width: 100%;
+          max-height: 90vh;
+          object-fit: contain;
+          border-radius: 8px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .close-modal {
+          position: absolute;
+          top: -40px;
+          right: 0;
+          color: white;
+          font-size: 30px;
+          cursor: pointer;
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: transform 0.2s ease;
+        }
+
+        .close-modal:hover {
+          transform: scale(1.1);
+        }
+
+        .menu-item-mobile-info {
+          flex-grow: 1;
+          min-width: 0;
+        }
+
+        .menu-item-mobile-title {
+          font-weight: 600;
+          font-size: 1rem;
+          color: #333;
+          margin-bottom: 4px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .menu-item-mobile-description {
+          font-size: 0.85rem;
+          color: #666;
+          margin-bottom: 8px;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          line-clamp: 2; /* Propriedade padrão para compatibilidade */
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          line-height: 1.3;
+          max-width: calc(
+            100% - 40px
+          ); /* Limita a largura para não sobrepor a seta */
+        }
+
+        .menu-item-mobile-price {
+          font-weight: 700;
+          color: var(--cor-primaria);
+          font-size: 1rem;
+        }
+
+        .menu-item-mobile-expand-icon {
+          position: absolute;
+          right: 12px;
+          top: 50%;
+          transform: translateY(-50%);
+          transition: transform 0.3s ease;
+        }
+
+        .menu-item-mobile-details {
+          max-height: 0;
+          overflow: hidden;
+          transition: all 0.5s ease;
+          background-color: #f9f9f9;
+          /* Borda superior removida */
+        }
+
+        .menu-item-mobile-details-inner {
+          padding: 16px;
+          opacity: 0;
+          transform: translateY(10px);
+          transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .menu-item.expanded {
+          box-shadow: 0 8px 16px rgba(var(--cor-primaria-rgb), 0.25); /* Sombra colorida mais suave */
+          border: 2px solid var(--cor-primaria); /* Borda mais grossa com a cor primária */
+          z-index: 5; /* Garante que fique acima dos outros cards */
+          position: relative; /* Necessário para o z-index funcionar */
+          background-color: #fff; /* Fundo mais claro para destacar */
+          margin-top: 8px !important; /* Espaçamento superior para destacar */
+          margin-bottom: 8px !important; /* Espaçamento inferior para destacar */
+          border-radius: 8px !important; /* Cantos arredondados para diferenciar */
+          transform: scale(1.02); /* Leve aumento de tamanho */
+        }
+
+        .menu-item.expanded .menu-item-mobile-details-inner {
+          opacity: 1;
+          transform: translateY(0);
+          border-radius: 8px !important; /* Cantos arredondados para diferenciar */
+        }
+
+        .menu-item.expanded .menu-item-mobile-details {
+          max-height: 500px; /* Altura máxima quando expandido */
+          border-top: 0px solid var(--primary-color); /* Borda superior mais destacada */
+        }
+
+        .menu-item.expanded .menu-item-mobile-expand-icon {
+          transform: translateY(-50%) rotate(180deg);
+          color: var(
+            --cor-primaria
+          ); /* Cor primária para o ícone quando expandido */
+        }
+
+        .menu-item.expanded .menu-item-mobile-view {
+          background-color: rgba(
+            var(--cor-secundaria-rgb),
+            0.1
+          ); /* Fundo com 10% de opacidade da cor secundária */
+        }
+
+        .menu-item.expanded .menu-item-mobile-title {
+          color: var(
+            --cor-primaria
+          ); /* Título na cor primária quando expandido */
+          font-weight: 700; /* Texto mais forte */
+        }
+
+        .menu-item.expanded .menu-item-mobile-price {
+          color: var(
+            --cor-primaria
+          ); /* Preço na cor primária quando expandido */
+          font-size: 1.1rem; /* Tamanho um pouco maior */
+          font-weight: 700; /* Texto mais forte */
+        }
+
+        /* Estilo para o ripple effect ao clicar */
+        /* Efeito ripple removido conforme solicitado pelo cliente */
+        /* A classe menu-item-ripple foi mantida no HTML apenas para compatibilidade, 
+               mas sem os efeitos visuais que incomodavam ao tocar nos cards */
+      }
+
+      .menu-item-image-wrapper {
+        position: relative;
+        overflow: hidden;
+        border-radius: 0;
+      }
+
+      /* Garante que as imagens tenham cantos retos no desktop */
+      @media (min-width: 768px) {
+        .menu-item-image-wrapper,
+        .menu-item-image-wrapper img,
+        .image-skeleton,
+        .menu-item-container img {
+          border-radius: 0 !important;
+        }
+
+        /* Para ter certeza que nenhuma outra classe do Tailwind está sobrescrevendo */
+        .rounded-lg,
+        .rounded-md,
+        .rounded-xl,
+        .rounded,
+        .rounded-sm {
+          border-radius: 0 !important;
+        }
+      }
+
+      .menu-item-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.975rem; /* Aumentado em 30% de 0.75rem */
+        font-weight: 600;
+      }
+
+      /* Animação do preço */
+      .price-highlight {
+        transition: all 0.2s ease;
+      }
+
+      .price-highlight:hover {
+        transform: scale(1.02);
+      }
+
+      /* Media queries específicas para dispositivos móveis */
+      @media only screen and (max-width: 767px) {
+        /* Aumentar fonte do parágrafo de descrição em 20% */
+        .text-gray-600.leading-snug.text-sm,
+        p.text-gray-600.leading-snug,
+        .menu-item-content p {
+          font-size: 1.05rem !important; /* 20% maior que text-sm para mobile */
+          margin-bottom: 15px !important; /* Garantir que a margem inferior seja aplicada */
+          padding-bottom: 5px !important; /* Adicionar padding para garantir espaçamento */
+        }
+
+        /* Ajustar espaçamento das tags/classificações */
+        .flex.flex-wrap.gap-1,
+        div.flex.flex-wrap,
+        .menu-item-content .flex {
+          margin-top: 10px !important;
+          margin-bottom: 10px !important;
+          padding-top: 2px !important;
+          padding-bottom: 2px !important;
+        }
+
+        /* Garantir que o botão Adicionar tenha tamanho adequado */
+        .adicionar-ao-carrinho,
+        button.adicionar-ao-carrinho {
+          font-size: 1rem !important;
+          padding: 8px 16px !important;
+          min-width: 120px !important;
+          height: 40px !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          gap: 6px !important;
+          touch-action: manipulation !important;
+          -webkit-tap-highlight-color: transparent !important;
+        }
+
+        /* Efeito de toque para dispositivos móveis */
+        .adicionar-ao-carrinho:active {
+          transform: scale(0.97) !important;
+        }
+
+        /* Garantir que as observações tenham tamanho adequado */
+        p.text-sm.text-gray-500.italic,
+        .menu-item-content .text-gray-500 {
+          font-size: 0.95rem !important;
+          margin-top: 10px !important;
+        }
+
+        /* Hack específico para Safari no iOS */
+        @supports (-webkit-touch-callout: none) {
+          .menu-item-content p {
+            margin-bottom: 15px !important;
+            font-size: 1.05rem !important;
+          }
+
+          .menu-item-content .flex {
+            margin-top: 10px !important;
+            margin-bottom: 10px !important;
+          }
+        }
+      }
+
+      /* Scroll horizontal estilo iFood com cores dinâmicas */
+      .category-scroll {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+
+      .category-scroll::-webkit-scrollbar {
+        display: none;
+      }
+
+      .category-item {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .category-item.active {
+        background-color: var(--cor-primaria) !important;
+        color: white !important;
+        /* Removido: sombra e efeitos de escala/translação */
+      }
+
+      .category-item.centered-item {
+        position: relative;
+        /* Removida a posição relativa que era usada para a bolinha */
+      }
+
+      /* Removido o pseudo-elemento ::after que criava a bolinha */
+
+      /* Classes dinâmicas que usam as variáveis CSS */
+      .bg-primary-dynamic {
+        background-color: var(--cor-primaria) !important;
+      }
+
+      .text-primary-dynamic {
+        color: var(--cor-primaria) !important;
+      }
+
+      .border-primary-dynamic {
+        border-color: var(--cor-primaria) !important;
+      }
+
+      .bg-secondary-dynamic {
+        background-color: var(--cor-secundaria) !important;
+      }
+
+      .text-secondary-dynamic {
+        color: var(--cor-secundaria) !important;
+      }
+
+      .hover-primary-dynamic:hover {
+        background-color: var(--cor-primaria) !important;
+        color: white !important;
+      }
+
+      /* Classes dinâmicas para texto e links */
+      .text-color-dynamic {
+        color: var(--cor-texto) !important;
+      }
+
+      .link-color-dynamic {
+        color: var(--cor-links) !important;
+      }
+
+      .link-color-dynamic:hover {
+        color: var(--cor-links) !important;
+        opacity: 0.8;
+      }
+
+      /* Classe específica para texto do rodapé */
+      .text-rodape-dynamic {
+        color: var(--cor-texto-rodape) !important;
+      }
+
+      /* Estilos para o sistema de busca */
+      .search-overlay {
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+        transition: all 0.3s ease;
+      }
+
+      .search-container {
+        transform: translateY(-20px);
+        opacity: 0;
+        transition: all 0.3s ease;
+      }
+
+      .search-container.active {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      .search-results {
+        max-height: 400px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+      }
+
+      .search-results::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .search-results::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+      }
+
+      .search-results::-webkit-scrollbar-thumb {
+        background: var(--cor-primaria);
+        border-radius: 3px;
+      }
+
+      .search-item {
+        transition: all 0.2s ease;
+      }
+
+      .search-item:hover {
+        background-color: #f8f9fa;
+        transform: translateX(5px);
+      }
+
+      .highlight {
+        background-color: yellow;
+        font-weight: bold;
+      }
+
+      /* Animação do ícone de busca */
+      .search-icon {
+        transition: all 0.3s ease;
+      }
+
+      .search-icon:hover {
+        transform: scale(1.1);
+        color: var(--cor-primaria);
+      }
+
+      /* 
+ * Estilos para os botões de compartilhamento
+ * Desenvolvido por Dante Testa (https://dantetesta.com.br)
+ */
+
+      /* Botão de compartilhamento geral (flutuante no canto esquerdo) */
+      .btn-compartilhar-geral {
+        position: fixed;
+        left: 20px;
+        bottom: 20px;
+        z-index: 49; /* Um pouco abaixo do carrinho (z-50) */
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn-compartilhar-geral:hover,
+      .btn-compartilhar-geral:focus {
+        transform: scale(1.1);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+      }
+
+      .btn-compartilhar-geral svg {
+        width: 24px;
+        height: 24px;
+      }
+
+      /* Botão de compartilhamento da categoria (sobreposto à imagem) */
+      .btn-compartilhar-categoria {
+        position: absolute !important;
+        top: 10px !important;
+        right: 10px !important;
+        width: 36px !important;
+        height: 36px !important;
+        border-radius: 50% !important;
+        background-color: rgba(255, 255, 255, 0.9) !important;
+        color: var(--primary-color) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+        border: none !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+        z-index: 39 !important; /* Valor logo abaixo do menu principal (z-index 40) */
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+      }
+
+      .btn-compartilhar-categoria:hover,
+      .btn-compartilhar-categoria:focus {
+        background-color: white;
+        transform: scale(1.1);
+      }
+
+      .btn-compartilhar-categoria svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      /* Posicionamento relativo para as imagens das categorias para suportar o botão absoluto */
+      .categoria-imagem-container {
+        position: relative;
+        width: 100%;
+      }
+
+      /* Adaptações para telas pequenas */
+      @media (max-width: 640px) {
+        .btn-compartilhar-geral {
+          width: 42px;
+          height: 42px;
+          left: 16px;
+          bottom: 16px;
+        }
+
+        .btn-compartilhar-geral svg {
+          width: 20px;
+          height: 20px;
+        }
+
+        .btn-compartilhar-categoria {
+          width: 32px;
+          height: 32px;
+        }
+
+        .btn-compartilhar-categoria svg {
+          width: 16px;
+          height: 16px;
+        }
+      }
+
+      /* Feedback visual ao compartilhar */
+      .compartilhamento-feedback {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        z-index: 100;
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+      }
+
+      .compartilhamento-feedback.ativo {
+        opacity: 1;
+      }
