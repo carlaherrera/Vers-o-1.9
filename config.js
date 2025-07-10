@@ -36,10 +36,10 @@
 
 // URLs das planilhas Google Sheets
 const CONFIG_PLANILHAS = {
-  categorias:
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vST_145cenMkoqUUiTNF00kuNjECQe0WUwa4zVL-qrDcoNfIhCmo3xXXVrgIVj65VpQEZv85Eetoqnd/pub?gid=244484282&single=true&output=csv",
-  itens:
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vST_145cenMkoqUUiTNF00kuNjECQe0WUwa4zVL-qrDcoNfIhCmo3xXXVrgIVj65VpQEZv85Eetoqnd/pub?gid=691800124&single=true&output=csv",
-  config:
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vST_145cenMkoqUUiTNF00kuNjECQe0WUwa4zVL-qrDcoNfIhCmo3xXXVrgIVj65VpQEZv85Eetoqnd/pub?gid=0&single=true&output=csv",
+
+    itens: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSmKIn0n5q4SSSlIDdBu34mW2GcylmU6dcO6hmX2Qi7JQfInuqhQP691vkxsGBAVqdW1DV6ARvMrjJy/pub?gid=1455563459&single=true&output=csv',
+  
+    categorias: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSmKIn0n5q4SSSlIDdBu34mW2GcylmU6dcO6hmX2Qi7JQfInuqhQP691vkxsGBAVqdW1DV6ARvMrjJy/pub?gid=264383639&single=true&output=csv',
+   
+    config: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSmKIn0n5q4SSSlIDdBu34mW2GcylmU6dcO6hmX2Qi7JQfInuqhQP691vkxsGBAVqdW1DV6ARvMrjJy/pub?gid=0&single=true&output=csv'
 };
