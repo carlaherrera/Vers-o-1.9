@@ -3906,10 +3906,19 @@ Variações: ${variacoesTexto.join(", ")}`;
             produtoContainer.id ||
             `item-${Date.now()}`;
 
-          // Encontrar o container de variações
-          const variacoesContainer = produtoContainer.querySelector(
+          // Encontrar o container de variações (mobile/desktop)
+          const variacoesContainers = produtoContainer.querySelectorAll(
             ".variacoes-container"
           );
+          let variacoesContainer = Array.from(variacoesContainers).find(
+            (c) => c.offsetParent !== null
+          );
+
+          // Se nenhum container visível for encontrado, usar o primeiro
+          if (!variacoesContainer) {
+            variacoesContainer = variacoesContainers[0];
+          }
+
           if (!variacoesContainer) {
             // Se não houver variações, adicionar normalmente com os parâmetros corretos
             adicionarAoCarrinhoSimples(itemId, titulo, button, 0);
