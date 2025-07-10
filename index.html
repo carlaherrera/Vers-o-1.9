@@ -146,7 +146,7 @@
 
       /* Garanta que as variações obrigatórias tenham um ícone de alerta */
       .variacoes-container[data-required="true"]::before {
-        content: "⚠️ ";
+
         color: #ef4444;
         margin-right: 5px;
       }
@@ -5905,7 +5905,11 @@ Variações: ${variacoesTexto.join(", ")}`;
           );
           if (botao) {
             botao.textContent = "Adicionar ao Carrinho";
-            botao.classList.remove("adicionado");
+            botao.classList.remove("bg-green-600", "hover:bg-green-700");
+            botao.classList.add(
+              "bg-primary-dynamic",
+              "hover:bg-primary-dynamic/90"
+            );
           }
 
           // Atualizar o contador no título do carrinho
@@ -8960,6 +8964,7 @@ Variações: ${variacoesTexto.join(", ")}`;
         });
       }
     </script>
+    
     <!-- Modal para exibição de imagem ampliada -->
     <div id="imageModal" class="image-modal">
       <div class="modal-content">
